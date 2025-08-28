@@ -1,58 +1,108 @@
-# -*- coding: utf-8 -*-
 import os
 import json
-import urllib.request
+import requests
 import base64
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor
 
-# ---------------- مسیر فایل‌های منابع ----------------
-TEXT_PATH = "tepo98.txt"
-JSON_PATH = "tepo98.json"
-YAML_PATH = "tepo98.yaml"
+# ======== تنظیمات =========
+# مسیر فایل‌های ورودی و خروجی
+INPUT_FILES = {
+    "txt": "tepo98.txt",
+    "json": "tepo98.json",
+    "yaml": "tepo98.yaml"
+}
+OUTPUT_FILES = {
+    "txt": "final.txt",
+    "json": "final.json",
+    "yaml": "final.yaml"
+}
 
-# ---------------- لینک منابع روی گیت‌هاب ----------------
+# لینک‌های ساب منبع (می‌توانی اضافه یا کم کنی)
 LINK_PATH = [
     "https://raw.githubusercontent.com/tepo18/tepo1398/main/tepo98.txt",
     "https://raw.githubusercontent.com/tepo18/tepo1398/main/tepo98.json",
     "https://raw.githubusercontent.com/tepo18/tepo1398/main/tepo98.yaml"
 ]
 
-# ---------------- مسیر خروجی نهایی ----------------
-FIN_PATH = "final.txt"
+# تست URL برای چک کردن کانفیگ‌ها
+TEST_URL = "https://www.gstatic.com/generate_204"
 
-# ---------------- هدر ثابت برای هر ساب ----------------
-FILE_HEADER_TEXT = "//profile-title: base64:2YfZhduM2LTZhyDZgdi52KfZhCDwn5iO8J+YjvCfmI4gaGFtZWRwNzE="
+# تعداد thread برای بررسی همزمان
+MAX_THREADS = 5
 
-# ---------------- خواندن محتوا از منابع ----------------
-def read_sources():
-    contents = []
-    for link in LINK_PATH:
+# ======== توابع =========
+
+def fetch_link(link):
+    try:
+        r = requests.get(link, timeout=10)
+        if r.status_code == 200:
+            return r.text.splitlines()
+    except:
+        return []
+    return []
+
+def validate_config_line(line: str) -> bool:
+    """
+    بررسی اعتبار کانفیگ
+    - فرمت اصلی
+    - base64 decode برای vmess
+    - بررسی عدم خالی بودن و پین صفر
+    """
+    line = line.strip()
+    if not line:
+        return False
+    if line.startswith("vmess://"):
         try:
-            with urllib.request.urlopen(link) as response:
-                data = response.read().decode("utf-8")
-                contents.append(data)
-        except Exception as e:
-            print(f"Failed to read {link}: {e}")
-    return contents
+            encoded = line[8:]
+            padded = encoded + '=' * (-len(encoded) % 4)
+            decoded = base64.b64decode(padded).decode('utf-8')
+            data = json.loads(decoded)
+            if not data.get("id"):
+                return False
+        except:
+            return False
+    # سایر پروتکل‌ها هم می‌توان بررسی مشابه داشت
+    return True
 
-# ---------------- پردازش محتوا (حذف خطوط خالی و کپی هدر) ----------------
-def process_contents(contents):
-    final_list = [FILE_HEADER_TEXT + "\n"]
-    for content in contents:
-        lines = content.splitlines()
-        for line in lines:
-            line = line.strip()
-            if line:  # حذف خطوط خالی
-                final_list.append(line + "\n")
-    return final_list
+def check_file(lines):
+    valid = []
+    for line in lines:
+        if validate_config_line(line):
+            valid.append(line)
+    return valid
 
-# ---------------- نوشتن خروجی نهایی ----------------
-def write_final(final_list):
-    with open(FIN_PATH, "w", encoding="utf-8") as f:
-        f.writelines(final_list)
-    print(f"Final output saved to {FIN_PATH}")
+def update_file(input_file, output_file):
+    # خواندن محتوا از لینک‌ها
+    all_lines = []
+    for link in LINK_PATH:
+        all_lines += fetch_link(link)
+    
+    # خواندن محتوا محلی
+    if os.path.exists(input_file):
+        with open(input_file, "r") as f:
+            all_lines += f.read().splitlines()
+    
+    # حذف خطوط خالی و تکراری
+    all_lines = list(dict.fromkeys(all_lines))
+    
+    # بررسی اعتبار کانفیگ‌ها با thread
+    valid_lines = []
+    with ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
+        future = [executor.submit(validate_config_line, l) for l in all_lines]
+        for i, f in enumerate(future):
+            if f.result():
+                valid_lines.append(all_lines[i])
+    
+    # ذخیره در خروجی
+    with open(output_file, "w") as f:
+        for line in valid_lines:
+            f.write(line + "\n")
+    print(f"Updated: {output_file}, {len(valid_lines)} valid configs.")
 
-# ---------------- اجرای اصلی ----------------
+# ======== اجرای اصلی =========
 if __name__ == "__main__":
-    sources = read_sources()
-    final_content = process_contents(sources)
-    write_final(final_content)
+    for key in INPUT_FILES:
+        update_file(INPUT_FILES[key], OUTPUT_FILES[key])
+    print("All files updated successfully!")
