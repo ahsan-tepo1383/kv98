@@ -1,0 +1,320 @@
+==========================
+[Bash Panel]  -> panel20.sh
+==========================
+
+
+
+اسکریپ اول 
+bash 
+
+🔔🏆🥎🌟🤩🥎📣
+
+
+#!/bin/bash
+
+CYAN="\e[36m"
+GREEN="\e[32m"
+YELLOW="\e[33m"
+RESET="\e[0m"
+
+BASE_PATH="$HOME"
+DOWNLOAD_DIR="/sdcard/Download/Akbar98"
+
+# Set Git user.name and user.email if not set
+if ! git config --global user.name >/dev/null || [ -z "$(git config --global user.name)" ]; then
+  echo -ne "${CYAN}Enter your Git user.name: ${RESET}"
+  read -r GIT_USER_NAME
+  git config --global user.name "$GIT_USER_NAME"
+fi
+
+if ! git config --global user.email >/dev/null || [ -z "$(git config --global user.email)" ]; then
+  echo -ne "${CYAN}Enter your Git user.email: ${RESET}"
+  read -r GIT_USER_EMAIL
+  git config --global user.email "$GIT_USER_EMAIL"
+fi
+
+echo -e "${CYAN}Have you already cloned the repo?${RESET}"
+echo "1) No, clone a new repo"
+echo "2) Yes, repo already cloned"
+echo -ne "${CYAN}Enter choice (1 or 2): ${RESET}"
+read -r CLONE_CHOICE
+
+if [ "$CLONE_CHOICE" == "1" ]; then
+  echo -ne "${CYAN}Enter the GitHub repo name to clone: ${RESET}"
+  read -r REPO_NAME
+  REPO_PATH="$BASE_PATH/$REPO_NAME"
+  
+  if [ -d "$REPO_PATH" ]; then
+    echo -e "${YELLOW}Folder '$REPO_PATH' already exists!${RESET}"
+  else
+    echo -e "${GREEN}Cloning repo from GitHub...${RESET}"
+    git clone "https://github.com/tepo18/$REPO_NAME.git" "$REPO_PATH"
+    if [ $? -ne 0 ]; then
+      echo -e "${YELLOW}Failed to clone repo. Exiting.${RESET}"
+      exit 1
+    fi
+  fi
+
+elif [ "$CLONE_CHOICE" == "2" ]; then
+  echo -ne "${CYAN}Enter existing repo folder name: ${RESET}"
+  read -r REPO_NAME
+  REPO_PATH="$BASE_PATH/$REPO_NAME"
+  
+  if [ ! -d "$REPO_PATH" ]; then
+    echo -e "${YELLOW}Folder '$REPO_PATH' not found! Exiting.${RESET}"
+    exit 1
+  fi
+else
+  echo -e "${YELLOW}Invalid choice. Exiting.${RESET}"
+  exit 1
+fi
+
+cd "$REPO_PATH" || { echo -e "${YELLOW}Cannot enter repo folder. Exiting.${RESET}"; exit 1; }
+
+while true; do
+  echo -e "\n${CYAN}Select an option:${RESET}"
+  echo "1) Create new file"
+  echo "2) Edit existing file"
+  echo "3) Delete a file"
+  echo "4) Commit changes"
+  echo "5) Push to GitHub"
+  echo "6) Copy file from download folder"
+  echo "7) Exit"
+  echo -ne "${CYAN}Choice: ${RESET}"
+  read -r CHOICE
+
+  case $CHOICE in
+    1)
+      echo -ne "${CYAN}Enter new filename to create: ${RESET}"
+      read -r NEWFILE
+      if [ -e "$NEWFILE" ]; then
+        echo -e "${YELLOW}File already exists.${RESET}"
+      else
+        touch "$NEWFILE"
+        echo -e "${GREEN}File '$NEWFILE' created.${RESET}"
+      fi
+      ;;
+    2)
+      echo -ne "${CYAN}Enter filename to edit: ${RESET}"
+      read -r EDITFILE
+      if [ ! -e "$EDITFILE" ]; then
+        echo -e "${YELLOW}File does not exist.${RESET}"
+      else
+        nano "$EDITFILE"
+      fi
+      ;;
+    3)
+      echo -ne "${CYAN}Enter filename to delete: ${RESET}"
+      read -r DELFILE
+      if [ ! -e "$DELFILE" ]; then
+        echo -e "${YELLOW}File does not exist.${RESET}"
+      else
+        rm -i "$DELFILE"
+        echo -e "${GREEN}File deleted.${RESET}"
+      fi
+      ;;
+    4)
+      git status
+      echo -ne "${CYAN}Enter commit message (leave empty for default): ${RESET}"
+      read -r MSG
+      git add .
+      if [ -z "$MSG" ]; then
+        MSG="auto update from script"
+      fi
+      git commit -m "$MSG"
+      if [ $? -eq 0 ]; then
+        echo -e "${GREEN}Changes committed.${RESET}"
+      else
+        echo -e "${YELLOW}Nothing to commit or commit failed.${RESET}"
+      fi
+      ;;
+    5)
+      echo -ne "${CYAN}Push changes to GitHub? (yes/no): ${RESET}"
+      read -r PUSH_ANSWER
+      if [ "$PUSH_ANSWER" == "yes" ]; then
+        git push
+        if [ $? -eq 0 ]; then
+          echo -e "${GREEN}Changes pushed successfully.${RESET}"
+        else
+          echo -e "${YELLOW}Push failed. Trying to pull first...${RESET}"
+          git pull --rebase
+          git push
+        fi
+      else
+        echo "Push canceled."
+      fi
+      ;;
+    6)
+      echo -ne "${CYAN}Enter source filename in download folder: ${RESET}"
+      read -r SRCFILE
+      SRC_PATH="$DOWNLOAD_DIR/$SRCFILE"
+      if [ ! -f "$SRC_PATH" ]; then
+        echo -e "${YELLOW}Source file not found.${RESET}"
+        continue
+      fi
+      echo -ne "${CYAN}Enter target filename in repo: ${RESET}"
+      read -r TARGETFILE
+      cat "$SRC_PATH" > "$TARGETFILE"
+      echo -e "${GREEN}Content copied successfully.${RESET}"
+      ;;
+    7)
+      echo "Exiting."
+      exit 0
+      ;;
+    *)
+      echo -e "${YELLOW}Invalid choice!${RESET}"
+      ;;
+  esac
+done
+
+==========================
+[Python Panel]  -> panel20.py
+
+
+
+
+
+==========================
+
+اسکریپ شماره 2 داخل لانچر
+
+🥎🌤🌟📣🎖🧭🎲✨🎏✨
+
+
+
+
+#!/usr/bin/env python3
+import os
+import subprocess
+
+CYAN="\033[36m"
+GREEN="\033[32m"
+YELLOW="\033[33m"
+RESET="\033[0m"
+
+BASE_PATH = os.path.expanduser("~")
+DOWNLOAD_DIR = "/sdcard/Download/Akbar98"
+
+# Git config
+def git_config():
+    try:
+        name = subprocess.check_output(["git", "config", "--global", "user.name"]).decode().strip()
+    except subprocess.CalledProcessError:
+        name = ""
+    if not name:
+        name = input(f"{CYAN}Enter your Git user.name: {RESET}")
+        subprocess.run(["git", "config", "--global", "user.name", name])
+    
+    try:
+        email = subprocess.check_output(["git", "config", "--global", "user.email"]).decode().strip()
+    except subprocess.CalledProcessError:
+        email = ""
+    if not email:
+        email = input(f"{CYAN}Enter your Git user.email: {RESET}")
+        subprocess.run(["git", "config", "--global", "user.email", email])
+
+git_config()
+
+choice = input(f"{CYAN}Have you already cloned the repo?\n1) No, clone a new repo\n2) Yes, repo already cloned\nEnter choice (1 or 2): {RESET}")
+if choice == "1":
+    repo_name = input(f"{CYAN}Enter GitHub repo name to clone: {RESET}")
+    repo_path = os.path.join(BASE_PATH, repo_name)
+    if os.path.exists(repo_path):
+        print(f"{YELLOW}Folder '{repo_path}' already exists!{RESET}")
+    else:
+        subprocess.run(["git", "clone", f"https://github.com/tepo18/{repo_name}.git", repo_path])
+elif choice == "2":
+    repo_name = input(f"{CYAN}Enter existing repo folder name: {RESET}")
+    repo_path = os.path.join(BASE_PATH, repo_name)
+    if not os.path.isdir(repo_path):
+        print(f"{YELLOW}Folder '{repo_path}' not found! Exiting.{RESET}")
+        exit(1)
+else:
+    print(f"{YELLOW}Invalid choice. Exiting.{RESET}")
+    exit(1)
+
+os.chdir(repo_path)
+
+def menu():
+    while True:
+        print(f"\n{CYAN}Select an option:{RESET}")
+        print("1) Create new file")
+        print("2) Edit existing file")
+        print("3) Delete a file")
+        print("4) Commit changes")
+        print("5) Push to GitHub")
+        print("6) Copy file from download folder")
+        print("7) Exit")
+        choice = input("Choice: ")
+        if choice == "1":
+            newfile = input("Enter new filename: ")
+            if os.path.exists(newfile):
+                print(f"{YELLOW}File already exists.{RESET}")
+            else:
+                open(newfile, "w").close()
+                print(f"{GREEN}File created.{RESET}")
+        elif choice == "2":
+            editfile = input("Enter filename to edit: ")
+            if not os.path.exists(editfile):
+                print(f"{YELLOW}File does not exist.{RESET}")
+            else:
+                subprocess.run(["nano", editfile])
+        elif choice == "3":
+            delfile = input("Enter filename to delete: ")
+            if not os.path.exists(delfile):
+                print(f"{YELLOW}File does not exist.{RESET}")
+            else:
+                os.remove(delfile)
+                print(f"{GREEN}File deleted.{RESET}")
+        elif choice == "4":
+            msg = input("Enter commit message (empty=auto update): ")
+            if not msg:
+                msg = "auto update from script"
+            subprocess.run(["git", "add", "."])
+            subprocess.run(["git", "commit", "-m", msg])
+        elif choice == "5":
+            push = input("Push to GitHub? (yes/no): ")
+            if push.lower
+            
+            
+            
+            
+            
+            
+            درادامه کد اسکریپ لانچر میذارم 
+            
+            
+            که هردو اسکریپ پوش داخل اون اجرامیشوند 
+            
+            
+            
+            🪀🎯🎯🌤🎯🥏🥏💊💊
+            
+            اسکریپ لانچر  راه انداز
+            
+            
+            
+            
+            #!/bin/bash
+# Launcher for panel20 scripts
+
+echo "Which panel do you want to run?"
+echo "1) Bash panel"
+echo "2) Python panel"
+read -r choice
+
+if [ "$choice" == "1" ]; then
+    if [ -f "./panel20.sh" ]; then
+        bash ./panel20.sh
+    else
+        echo "panel20.sh not found!"
+    fi
+elif [ "$choice" == "2" ]; then
+    if [ -f "./panel20.py" ]; then
+        python3 ./panel20.py
+    else
+        echo "panel20.py not found!"
+    fi
+else
+    echo "Invalid choice!"
+fi
