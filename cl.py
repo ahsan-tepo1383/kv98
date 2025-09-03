@@ -16,11 +16,11 @@ FINAL_PATH = "final.txt"
 
 # ---------------- لینک‌های منابع ----------------
 LINKS_RAW = [
-    "https://raw.githubusercontent.com/tepo90/online-sshmax98/main/tepo10.txt",
-    "https://raw.githubusercontent.com/tepo90/online-sshmax98/main/tepo20.txt",
-    "https://raw.githubusercontent.com/tepo90/online-sshmax98/main/tepo30.txt",
-    "https://raw.githubusercontent.com/tepo90/online-sshmax98/main/tepo40.txt",
-    "https://raw.githubusercontent.com/tepo90/online-sshmax98/main/tepo50.txt",
+    "https://raw.githubusercontent.com/tepo90/main/tepo10.txt",
+    "https://raw.githubusercontent.com/tepo90/main/tepo20.txt",
+    "https://raw.githubusercontent.com/tepo90/main/tepo30.txt",
+    "https://raw.githubusercontent.com/tepo90/main/tepo40.txt",
+    "https://raw.githubusercontent.com/tepo90/main/tepo50.txt",
 ]
 
 # ---------------- تابع دریافت محتوا ----------------
