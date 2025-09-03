@@ -27,11 +27,11 @@ with open(CONF_PATH,"r") as file_client_set:
         f=json.load(file_client_set)
         test_link_=f["core"]["test_url"]
 TEXT_PATH="normal.txt"
-LINK_PATH=[ "https://raw.githubusercontent.com/tepo18/online-sshmax98/main/tepo10.json",
-    "https://raw.githubusercontent.com/tepo18/online-sshmax98/main/tepo20.json",
-    "https://raw.githubusercontent.com/tepo18/online-sshmax98/main/tepo30.json",
-    "https://raw.githubusercontent.com/tepo18/online-sshmax98/main/tepo40.json",
-    "https://raw.githubusercontent.com/tepo18/online-sshmax98/main/tepo50.json" ] # [ "" , "" , ... ]
+LINK_PATH=[ "https://raw.githubusercontent.com/tepo18/tepo90/main/tepo10.json",
+    "https://raw.githubusercontent.com/tepo18/tepo90/main/tepo20.json",
+    "https://raw.githubusercontent.com/tepo18/tepo90/main/tepo30.json",
+    "https://raw.githubusercontent.com/tepo18/tepo90/main/tepo40.json",
+    "https://raw.githubusercontent.com/tepo18/tepo90/main/tepo50.json" ] # [ "" , "" , ... ]
 FIN_PATH="final.txt"
 # ==============================================================================
 # <<<<<<<<<<<<<<<< این خط را اضافه کنید >>>>>>>>>>>>>>>>
@@ -2101,6 +2101,7 @@ save_sorted_configs(FIN_CONF)
 
 print("پردازش با موفقیت به پایان رسید.")
 exit()
+
 
 
 
