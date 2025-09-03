@@ -27,13 +27,13 @@ with open(CONF_PATH,"r") as file_client_set:
         f=json.load(file_client_set)
         test_link_=f["core"]["test_url"]
 TEXT_PATH="normal.txt"
-LINK_PATH = [
-    "tepo10.txt",
-    "tepo20.txt",
-    "tepo30.txt",
-    "tepo40.txt",
-    "tepo50.txt",
-]
+LINK_PATH=[ 
+    "https://raw.githubusercontent.com/tepo18/tepo90/main/tepo10.txt",
+    "https://raw.githubusercontent.com/tepo18/tepo90/main/tepo20.txt",
+    "https://raw.githubusercontent.com/tepo18/tepo90/main/tepo30.txt",
+    "https://raw.githubusercontent.com/tepo18/tepo90/main/tepo40.txt",
+    "https://raw.githubusercontent.com/tepo18/tepo90/main/tepo50.txt",
+        ]
 FIN_PATH="final.txt"
 # ==============================================================================
 # <<<<<<<<<<<<<<<< این خط را اضافه کنید >>>>>>>>>>>>>>>>
@@ -2103,6 +2103,7 @@ save_sorted_configs(FIN_CONF)
 
 print("پردازش با موفقیت به پایان رسید.")
 exit()
+
 
 
 
