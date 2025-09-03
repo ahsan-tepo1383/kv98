@@ -2,20 +2,21 @@
 # -*- coding: utf-8 -*-
 
 import os
+import time
 import json
+import base64
 import threading
 import urllib.request
 import subprocess
-import time
 import platform
 import re
 
 # ---------------- مسیر فایل‌ها ----------------
-NORMAL_PATH = "normal.txt"
-FINAL_PATH = "final.txt"
+TEXT_NORMAL = "normal.txt"
+TEXT_FINAL = "final.txt"
 
-# ---------------- لینک‌های منابع ----------------
-LINKS_RAW = [
+# ---------------- منابع ----------------
+LINKS = [
     "https://raw.githubusercontent.com/tepo18/tepo90/main/tepo10.txt",
     "https://raw.githubusercontent.com/tepo18/tepo90/main/tepo20.txt",
     "https://raw.githubusercontent.com/tepo18/tepo90/main/tepo30.txt",
@@ -23,110 +24,144 @@ LINKS_RAW = [
     "https://raw.githubusercontent.com/tepo18/tepo90/main/tepo50.txt",
 ]
 
-# ---------------- تابع دریافت محتوا ----------------
-def fetch_url_lines(url):
-    try:
-        with urllib.request.urlopen(url, timeout=15) as resp:
-            return [line.decode().strip() for line in resp.readlines() if line.strip()]
-    except Exception as e:
-        print(f"[ERROR] Cannot fetch {url}: {e}")
-        return []
-
 # ---------------- پینگ واقعی ----------------
-def ping(host, count=1, timeout=1):
+def ping(host: str, count: int = 1, timeout: int = 1) -> float:
     param_count = "-n" if platform.system().lower() == "windows" else "-c"
     param_timeout = "-w" if platform.system().lower() == "windows" else "-W"
     try:
-        cmd = ["ping", param_count, str(count), param_timeout, str(timeout), host]
-        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        output = result.stdout
-        match = re.findall(r'time[=<]?\s*(\d+\.?\d*)', output)
+        result = subprocess.run(
+            ["ping", param_count, str(count), param_timeout, str(timeout), host],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        match = re.search(r'time[=<]\s*(\d+\.?\d*)', result.stdout)
         if match:
-            # میانگین پینگ
-            times = [float(m) for m in match]
-            return sum(times)/len(times)
+            return float(match.group(1))
     except:
         pass
     return float('inf')
 
-# ---------------- پردازش پینگ با چند بار تست ----------------
-def ping_stage(configs, max_threads=20, ping_count=3):
+# ---------------- خواندن منابع ----------------
+def fetch_lines(url):
+    try:
+        with urllib.request.urlopen(url, timeout=15) as resp:
+            data = resp.read().decode(errors="ignore")
+            return [line.strip() for line in data.splitlines() if line.strip()]
+    except Exception as e:
+        print(f"[ERROR] Cannot fetch {url}: {e}")
+        return []
+
+# ---------------- استخراج host ----------------
+def get_host(line):
+    try:
+        if line.startswith("vmess://"):
+            b64 = line[8:].split('#')[0]
+            missing_padding = len(b64) % 4
+            if missing_padding: b64 += '=' * (4 - missing_padding)
+            js = json.loads(base64.b64decode(b64).decode('utf-8'))
+            host = js.get("add") or js.get("host")
+            return host
+        elif line.startswith("vless://") or line.startswith("trojan://") or line.startswith("ss://"):
+            return line.split("@")[1].split(":")[0]
+        else:
+            return None
+    except:
+        return None
+
+# ---------------- پردازش پینگ اولیه ----------------
+def first_ping(lines):
     results = []
     lock = threading.Lock()
     threads = []
 
-    def worker(cfg_line):
-        try:
-            cfg = json.loads(cfg_line)
-            outbounds = cfg.get("outbounds", [])
-            if outbounds:
-                addr = outbounds[0].get("settings", {}).get("vnext", [{}])[0].get("address")
-                if addr:
-                    # میانگین چند پینگ برای پایداری
-                    ping_values = [ping(addr) for _ in range(ping_count)]
-                    if all(p < float('inf') for p in ping_values):
-                        avg_ping = sum(ping_values)/len(ping_values)
-                        with lock:
-                            cfg["_ping"] = avg_ping
-                            results.append(cfg)
-        except:
-            pass
+    def worker(line):
+        host = get_host(line)
+        if host:
+            p = ping(host)
+            if p < float('inf'):
+                with lock:
+                    results.append((line, p))
 
-    for cfg_line in configs:
-        t = threading.Thread(target=worker, args=(cfg_line,))
-        threads.append(t)
+    for line in lines:
+        t = threading.Thread(target=worker, args=(line,))
         t.start()
-        if len(threads) >= max_threads:
+        threads.append(t)
+        if len(threads) >= 20:
             for th in threads: th.join()
             threads = []
 
-    for t in threads: t.join()
+    for th in threads: th.join()
 
-    # حذف تکراری
     unique = {}
-    for cfg in results:
-        key = cfg.get("remarks")
-        if key not in unique:
-            unique[key] = cfg
-    final_list = list(unique.values())
-    final_list.sort(key=lambda x: x.get("_ping", float('inf')))
-    return final_list
+    for line, p in results:
+        if line not in unique:
+            unique[line] = p
+
+    sorted_lines = sorted(unique.keys(), key=lambda x: unique[x])
+    return sorted_lines
+
+# ---------------- پردازش پینگ دقیق ----------------
+def detailed_ping(lines, max_ping=1200):
+    results = []
+    lock = threading.Lock()
+    threads = []
+
+    def worker(line):
+        host = get_host(line)
+        if host:
+            p = ping(host, count=3, timeout=2)  # چندبار پینگ برای پایدارتر بودن
+            if p <= max_ping:
+                with lock:
+                    results.append((line, p))
+
+    for line in lines:
+        t = threading.Thread(target=worker, args=(line,))
+        t.start()
+        threads.append(t)
+        if len(threads) >= 20:
+            for th in threads: th.join()
+            threads = []
+
+    for th in threads: th.join()
+
+    unique = {}
+    for line, p in results:
+        if line not in unique:
+            unique[line] = p
+
+    sorted_lines = sorted(unique.keys(), key=lambda x: unique[x])
+    return sorted_lines
 
 # ---------------- ذخیره فایل ----------------
-def save_configs_file(configs, path):
+def save_file(path, lines):
     with open(path, "w", encoding="utf-8") as f:
-        for cfg in configs:
-            cfg.pop("_ping", None)
-            f.write(json.dumps(cfg, ensure_ascii=False) + "\n")
-    print(f"[INFO] Saved {len(configs)} configs to {path}")
+        for line in lines:
+            f.write(line + "\n")
+    print(f"[INFO] Saved {len(lines)} configs to {path}")
 
-# ---------------- فرآیند اصلی بروزرسانی ----------------
+# ---------------- بروزرسانی ----------------
 def update_all():
     print("[*] Fetching sources...")
-    all_configs_raw = []
-    for url in LINKS_RAW:
-        all_configs_raw.extend(fetch_url_lines(url))
-    print(f"[*] Total lines fetched: {len(all_configs_raw)}")
+    all_lines = []
+    for link in LINKS:
+        all_lines.extend(fetch_lines(link))
+    print(f"[*] Total lines fetched: {len(all_lines)}")
 
-    # مرحله اول پینگ → normal.txt
     print("[*] Stage 1: First ping check (basic filtering)...")
-    stage1_configs = ping_stage(all_configs_raw, ping_count=1)
-    save_configs_file(stage1_configs, NORMAL_PATH)
+    normal_lines = first_ping(all_lines)
+    save_file(TEXT_NORMAL, normal_lines)
 
-    # مرحله دوم پینگ دقیق و پایداری → final.txt
     print("[*] Stage 2: Detailed ping stability check...")
-    normal_lines = [json.dumps(cfg, ensure_ascii=False) for cfg in stage1_configs]
-    stage2_configs = ping_stage(normal_lines, ping_count=3)  # میانگین 3 پینگ
-    # فیلتر پینگ ≤ 1200
-    stage2_configs = [cfg for cfg in stage2_configs if cfg.get("_ping", float('inf')) <= 1200]
-    save_configs_file(stage2_configs, FINAL_PATH)
-    print(f"[✅] Update complete. {len(stage2_configs)} configs in final.txt")
+    final_lines = detailed_ping(normal_lines)
+    save_file(TEXT_FINAL, final_lines)
 
-# ---------------- Main ----------------
+# ---------------- حلقه بروزرسانی خودکار ----------------
 if __name__ == "__main__":
-    print("[*] Starting auto-updater with stable ping checks...")
+    print("[*] Starting auto-updater with two-stage ping...")
     while True:
         start_time = time.time()
         update_all()
-        print(f"[*] Next update in 1 hour. Elapsed: {time.time() - start_time:.2f}s\n")
+        elapsed = time.time() - start_time
+        print(f"[*] Update complete. Next update in 1 hour. Elapsed: {elapsed:.2f}s\n")
         time.sleep(3600)
