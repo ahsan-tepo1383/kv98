@@ -2093,7 +2093,7 @@ if __name__ == "__main__":
     print(f"Found {len(cleaned_configs)} unique configs after cleaning.")
 
     # مرحله ۳: تنظیم تگ اولیه
-    tagged_configs = set_initial_tag(cleaned_configs, "hamedp71")
+    tagged_configs = set_initial_tag(cleaned_configs, "almasi98")
 
     # مرحله ۴: نوشتن کانفیگ‌های آماده در فایل ورودی برای تستر
     print(f"Writing {len(tagged_configs)} prepared configs to '{TEXT_PATH}' for testing...")
