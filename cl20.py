@@ -29,7 +29,7 @@ with open(CONF_PATH,"r") as file_client_set:
 TEXT_PATH="normal10.txt"
 LINK_PATH=["https://raw.githubusercontent.com/tepo18/sab-vip10/main/tepo10.txt",
 "https://raw.githubusercontent.com/tepo18/sab-vip10/main/tepo20.txt",
-"https://raw.githubusercontent.com/tepo18/sab-vip10/main/teppo30.txt",
+"https://raw.githubusercontent.com/tepo18/sab-vip10/main/tepo30.txt",
 "https://raw.githubusercontent.com/tepo18/sab-vip10/main/tepo40.txt",
 "https://raw.githubusercontent.com/tepo18/sab-vip10/main/tepo50.txt",] # [ "" , "" , ... ]
 FIN_PATH="final10.txt"
