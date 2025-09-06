@@ -1909,7 +1909,7 @@ import re
 import os
 import urllib.parse
 
-def set_initial_tag(configs_list: list, almasi98: str) -> list:
+def set_initial_tag(configs_list: list, new_tag: str) -> list:
     """
     تگ اولیه تمام کانفیگ‌ها را به مقدار مشخص شده تغییر می‌دهد.
     این تابع به صورت ویژه کانفیگ‌های vmess را با رعایت پدینگ مدیریت می‌کند.
