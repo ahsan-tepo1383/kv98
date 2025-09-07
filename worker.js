@@ -201,6 +201,10 @@ async function handleRequest(request) {
     const clashMetaFormat = fragmentParam === 'clash' || settings.fragment.clashMetaFormat;
 
     const subscribeUrls = [
+        "https://raw.githubusercontent.com/tepo18/tepo90/main/final.txt",
+        "https://raw.githubusercontent.com/tepo18/sab-vip10/main/final.txt",
+        "https://raw.githubusercontent.com/tepo18/reza-shah1320/main/final.txt",
+        "https://raw.githubusercontent.com/tepo18/online-sshmax98/main/final.txt",
         "https://raw.githubusercontent.com/tepo18/sab-vip10/main/final.txt",
         "https://raw.githubusercontent.com/Surfboardv2ray/TGParse/refs/heads/main/configtg.txt",
         "https://raw.githubusercontent.com/Surfboardv2ray/Proxy-sorter/refs/heads/main/custom/ipv6.txt",
@@ -776,7 +780,7 @@ function renderPanel() {
       
       // Set recommended settings based on goal
       switch(goal) {
-        case '🚀 Speed':
+        case 'ð Speed':
           recommendedSettings = {
             protocols: ['vless', 'trojan'],
             ports: ['443', '8443'],
@@ -786,7 +790,7 @@ function renderPanel() {
             fragment: false
           };
           break;
-        case '🔒 Security':
+        case 'ð Security':
           recommendedSettings = {
             protocols: ['trojan'],
             ports: ['443'],
@@ -796,7 +800,7 @@ function renderPanel() {
             fragment: false
           };
           break;
-        case '🌐 Bypass':
+        case 'ð Bypass':
           recommendedSettings = {
             protocols: ['vmess', 'vless'],
             ports: ['80', '443', '8080'],
@@ -810,9 +814,9 @@ function renderPanel() {
       
       // Update recommendation display
       const recText = {
-        '🚀 Speed': 'For maximum speed, VLESS/Trojan with TLS on ports 443/8443 is recommended.',
-        '🔒 Security': 'For maximum security, Trojan with TLS on port 443 is recommended.',
-        '🌐 Bypass': 'For bypassing restrictions, VMESS/VLESS with multiple ports and IPv6 is recommended.'
+        'ð Speed': 'For maximum speed, VLESS/Trojan with TLS on ports 443/8443 is recommended.',
+        'ð Security': 'For maximum security, Trojan with TLS on port 443 is recommended.',
+        'ð Bypass': 'For bypassing restrictions, VMESS/VLESS with multiple ports and IPv6 is recommended.'
       }[goal];
       
       document.getElementById('wizardRecommendation').innerHTML = recText;
@@ -1048,7 +1052,7 @@ function renderPanel() {
     <h2>Welcome to the Arista Panel</h2>
     <p>You can manage your settings here or use the wizard for automatic configuration.</p>
     
-    <button class="save-button" onclick="startWizard()" style="background-color: #3B82F6;">🧙‍♂︄1�7 Start Configuration Wizard</button>
+    <button class="save-button" onclick="startWizard()" style="background-color: #3B82F6;">ð§ââï¸1¤7 Start Configuration Wizard</button>
 
     <div class="settings-section">
       <h3>Settings</h3>
@@ -1149,7 +1153,7 @@ function renderPanel() {
   <div class="container" id="wizardPanel" style="display: none;">
     <div class="wizard-container">
       <div class="wizard-header">
-        <div class="wizard-icon">✄1�7</div>
+        <div class="wizard-icon">â1¤7</div>
         <div class="wizard-title">Configuration Wizard</div>
       </div>
       <div class="wizard-progress">
@@ -1159,16 +1163,16 @@ function renderPanel() {
       <!-- Step 1: Goal Selection -->
       <div class="wizard-step active" id="step1">
         <h3>What is your main goal?</h3>
-        <div class="wizard-option" onclick="selectGoal('🚀 Speed')">
-          <div class="wizard-option-icon">🚀</div>
+        <div class="wizard-option" onclick="selectGoal('ð Speed')">
+          <div class="wizard-option-icon">ð</div>
           <div>Maximum Speed</div>
         </div>
-        <div class="wizard-option" onclick="selectGoal('🔒 Security')">
-          <div class="wizard-option-icon">🔒</div>
+        <div class="wizard-option" onclick="selectGoal('ð Security')">
+          <div class="wizard-option-icon">ð</div>
           <div>Maximum Security</div>
         </div>
-        <div class="wizard-option" onclick="selectGoal('🌐 Bypass')">
-          <div class="wizard-option-icon">🌐</div>
+        <div class="wizard-option" onclick="selectGoal('ð Bypass')">
+          <div class="wizard-option-icon">ð</div>
           <div>Bypass Restrictions</div>
         </div>
       </div>
@@ -1776,7 +1780,11 @@ async function generateClashConfig(ports, protocol, settings) {
 }
 
 async function generateV2rayConfig(protocol, ports, settings) {
-  const rawConfigs = await fetchConfigs([    "https://raw.githubusercontent.com/tepo18/sab-vip10/main/final.txt",
+  const rawConfigs = await fetchConfigs([    
+        "https://raw.githubusercontent.com/tepo18/tepo90/main/final.txt",
+        "https://raw.githubusercontent.com/tepo18/reza-shah1320/main/final.txt",
+        "https://raw.githubusercontent.com/tepo18/online-sshmax98/main/final.txt",
+        "https://raw.githubusercontent.com/tepo18/sab-vip10/main/final.txt",
         "https://raw.githubusercontent.com/Surfboardv2ray/TGParse/refs/heads/main/configtg.txt",
         "https://raw.githubusercontent.com/Surfboardv2ray/Proxy-sorter/refs/heads/main/custom/ipv6.txt",
         "https://raw.githubusercontent.com/Surfboardv2ray/Proxy-sorter/refs/heads/main/custom/udp.txt",
@@ -1792,11 +1800,11 @@ async function generateV2rayConfig(protocol, ports, settings) {
         "https://raw.githubusercontent.com/Kolandone/v2raycollector/main/ss.txt",
         "https://raw.githubusercontent.com/Kolandone/v2raycollector/main/trojan.txt",
         "https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/refs/heads/main/protocols/trojan",    
-     'https://raw.githubusercontent.com/Epodonios/v2ray-configs/refs/heads/main/Splitted-By-Protocol/vmess.txt',
-    'https://raw.githubusercontent.com/Epodonios/v2ray-configs/refs/heads/main/Config%20list10.txt',
-    'https://raw.githubusercontent.com/Epodonios/v2ray-configs/refs/heads/main/Config%20list1.txt',
-    'https://raw.githubusercontent.com/Epodonios/v2ray-configs/refs/heads/main/Config%20list11.txt',
-    'https://raw.githubusercontent.com/Epodonios/v2ray-configs/refs/heads/main/Config%20list2.txt'
+        "https://raw.githubusercontent.com/Epodonios/v2ray-configs/refs/heads/main/Splitted-By-Protocol/vmess.txt",
+        "https://raw.githubusercontent.com/Epodonios/v2ray-configs/refs/heads/main/Config%20list10.txt",
+        "https://raw.githubusercontent.com/Epodonios/v2ray-configs/refs/heads/main/Config%20list1.txt",
+        "https://raw.githubusercontent.com/Epodonios/v2ray-configs/refs/heads/main/Config%20list11.txt",
+        "https://raw.githubusercontent.com/Epodonios/v2ray-configs/refs/heads/main/Config%20list2.txt"
   ], settings.remoteDNS, settings.directDNS);
 
   let configContent = '';
