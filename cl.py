@@ -17,11 +17,11 @@ TEXT_FINAL = "final.txt"
 
 # ---------------- منابع ----------------
 LINKS = [
-    "https://raw.githubusercontent.com/tepo18/tepo90/main/tepo10.txt",
-    "https://raw.githubusercontent.com/tepo18/tepo90/main/tepo20.txt",
-    "https://raw.githubusercontent.com/tepo18/tepo90/main/tepo30.txt",
-    "https://raw.githubusercontent.com/tepo18/tepo90/main/tepo40.txt",
-    "https://raw.githubusercontent.com/tepo18/tepo90/main/tepo50.txt",
+    "https://raw.githubusercontent.com/ahsan-tepo1383/kv98/main/tepo10.txt",
+    "https://raw.githubusercontent.com/ahsan-tepo1383/kv98/main/tepo20.txt",
+    "https://raw.githubusercontent.com/ahsan-tepo1383/kv98/main/tepo30.txt",
+    "https://raw.githubusercontent.com/ahsan-tepo1383/kv98/main/tepo40.txt",
+    "https://raw.githubusercontent.com/ahsan-tepo1383/kv98/main/tepo50.txt",
 ]
 
 # ---------------- پینگ واقعی ----------------
