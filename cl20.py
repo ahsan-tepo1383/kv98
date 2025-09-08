@@ -2110,16 +2110,3 @@ if __name__ == "__main__":
     process_manager.stop_all()
     print("All tasks finished successfully.")
     sys.exit()
-
-
-
-
-
-
-
-
-
-
-
-
-
