@@ -1,0 +1,2 @@
+//profile-title: base64:2YfZhduM2LTZhyDZgdi52KfZhCDwn5iO8J+YjvCfmI4gaGFtZWRwNzE=
+vless://jrghxqxyoy@npmjs.com:2053?path=%2Fdownload%2Fcdn&security=tls&alpn=h2%2Chttp%2F1.1&encryption=none&host=jrghxqxyoy-518237151.zamam.co&fp=randomized&type=httpupgrade&sni=jrghxqxyoy-518237151.zamam.co#hamedp71%3A%3A%F0%9F%87%B7%F0%9F%87%B4

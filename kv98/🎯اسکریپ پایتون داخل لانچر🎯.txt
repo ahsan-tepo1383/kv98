@@ -1,0 +1,94 @@
+#!/usr/bin/env python3
+import os
+import subprocess
+
+BASE_PATH = os.path.expanduser("~")
+DOWNLOAD_DIR = "/sdcard/Download/Akbar98"
+
+GIT_USER_NAME = "YourGitUserName"
+GIT_USER_EMAIL = "youremail@example.com"
+GIT_TOKEN = "YOUR_PERSONAL_ACCESS_TOKEN"
+
+os.system(f"git config --global user.name {GIT_USER_NAME}")
+os.system(f"git config --global user.email {GIT_USER_EMAIL}")
+
+print("Have you already cloned the repo?")
+print("1) No, clone a new repo")
+print("2) Yes, repo already cloned")
+choice = input("Enter choice (1 or 2): ")
+
+if choice == "1":
+    REPO_NAME = input("Enter the GitHub repo name to clone: ")
+    REPO_PATH = os.path.join(BASE_PATH, REPO_NAME)
+    if os.path.exists(REPO_PATH):
+        print(f"Folder '{REPO_PATH}' already exists!")
+    else:
+        url = f"https://{GIT_USER_NAME}:{GIT_TOKEN}@github.com/{GIT_USER_NAME}/{REPO_NAME}.git"
+        subprocess.run(["git", "clone", url, REPO_PATH])
+elif choice == "2":
+    REPO_NAME = input("Enter existing repo folder name: ")
+    REPO_PATH = os.path.join(BASE_PATH, REPO_NAME)
+    if not os.path.exists(REPO_PATH):
+        print(f"Folder '{REPO_PATH}' not found! Exiting.")
+        exit(1)
+else:
+    print("Invalid choice. Exiting.")
+    exit(1)
+
+os.chdir(REPO_PATH)
+
+while True:
+    print("\nSelect an option:")
+    print("1) Create new file")
+    print("2) Edit existing file")
+    print("3) Delete a file")
+    print("4) Commit changes")
+    print("5) Push to GitHub")
+    print("6) Copy file from download folder")
+    print("7) Exit")
+    CHOICE = input("Choice: ")
+
+    if CHOICE == "1":
+        newfile = input("Enter new filename to create: ")
+        if os.path.exists(newfile):
+            print("File already exists.")
+        else:
+            open(newfile, "w").close()
+            print(f"File '{newfile}' created.")
+    elif CHOICE == "2":
+        editfile = input("Enter filename to edit: ")
+        if not os.path.exists(editfile):
+            print("File does not exist.")
+        else:
+            subprocess.run(["nano", editfile])
+    elif CHOICE == "3":
+        delfile = input("Enter filename to delete: ")
+        if not os.path.exists(delfile):
+            print("File does not exist.")
+        else:
+            os.remove(delfile)
+            print("File deleted.")
+    elif CHOICE == "4":
+        msg = input("Enter commit message: ")
+        if not msg:
+            msg = "auto update from script"
+        subprocess.run(["git", "add", "."])
+        subprocess.run(["git", "commit", "-m", msg])
+    elif CHOICE == "5":
+        url = f"https://{GIT_USER_NAME}:{GIT_TOKEN}@github.com/{GIT_USER_NAME}/{REPO_NAME}.git"
+        subprocess.run(["git", "push", url])
+    elif CHOICE == "6":
+        srcfile = input(f"Enter source filename in {DOWNLOAD_DIR}: ")
+        srcpath = os.path.join(DOWNLOAD_DIR, srcfile)
+        if not os.path.exists(srcpath):
+            print("Source file not found.")
+            continue
+        targetfile = input("Enter target filename in repo folder: ")
+        with open(srcpath, "r") as fsrc, open(targetfile, "w") as fdest:
+            fdest.write(fsrc.read())
+        print("Copied successfully.")
+    elif CHOICE == "7":
+        print("Exiting.")
+        break
+    else:
+        print("Invalid choice.")
